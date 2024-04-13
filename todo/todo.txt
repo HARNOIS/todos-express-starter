@@ -1,0 +1,17 @@
+1. I need to make it so that the different insurances appear on the edit screen.
+
+
+
+
+
+Extra Code Snippet I Will Need
+                <ul class="insurance-list">
+                    <% clients.forEach(function(client) { %>
+                    <li>
+                        <div class="view">
+                            <input class="toggle" type="checkbox" name="client" value="<%= client.id %>" onchange="toggleInsuranceSelection(this);">
+                            <label><%= client.name %></label>
+                        </div>
+                    </li>
+                    <% }); %>
+                </ul>    
