@@ -1,29 +1,77 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Ascend Data Tracker</title>
-		<link rel="stylesheet" href="/css/base.css">
-		<link rel="stylesheet" href="/css/index.css">
-		<link rel="stylesheet" href="/css/home.css">
-	</head>
-	<body>
-		<section class="todohome">
-			<header>
-				<h1>Profile of <%= user.username %></h1>
-			</header>
-			<section>
-				<h2>Modify Active Client </h2>
-                <a class = "button" href = "/activeClient"> Modify Active Clients</a>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ascend Data Tracker</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/split.css">
+</head>
+<body>
+    
+    <section class="todohome">
+        <nav class="nav">
+            <ul>
+                <li class="user"><%= user.name || user.username || user.email %></li>
+                <br>
+                <li>
+                    <form action="/edit" method="get">
+                        <button class="editt" type="submit">Edit Profile</button>
+                    </form>
+                    <form action="/logout" method="post">
+                        <button class="logout" type="submit">Sign out</button>
+                    </form>
+                    
+                </li>
+            </ul>
+        </nav>
+        <header>
+            <h1>Settings</h1>
+        </header>
+        <section>
+            <h2>Modify Active Client </h2>
 
-                <a class = "button" href = "/newClient"> Add New Client</a>
+            <section class="splitSections">
+                
+                <section id="leftSection">
+                <h3> Active Clients </h3>
+                <ul class="activeClientsList"></ul>
+                    <% activeclients.forEach(function(client) { %>
+                        <li>
+                            <div class="view">
+                                <input class="toggle" type="checkbox" name="activeclient" value="<%= client.id %>" onchange="toggleInsuranceSelection(this);">
+                                <label><%= activeclient.name %> <%= activeclient.dob %></label>
+                            </div>
+                        </li>
+                    <% }); %>
+                </ul>    
+                </section>
 
-			</section>
-		</section>
-		<footer class="info">
-			<p>Created by John Harnois</a></p>
-			<p>Part of <a href="https://ascendwithaba.com/">Ascend ABA </a></p>
-		</footer>
-	</body>
+                <section id="rightSection">
+                    <h3> All Clients </h3>
+                    <form action="/activeClient" method="post">
+                        <ul class="allClientsList">
+                            <% clients.forEach(function(client) { %>
+                                <li>
+                                    <div class="view">
+                                        <input class="toggle" type="checkbox" name="client" value="<%= client.id %>" onchange="toggleInsuranceSelection(this);">
+                                        <label><%= client.name %> <%= client.dob %></label>
+                                    </div>
+                                </li>
+                            <% }); %>
+                        </ul>
+                        <button type="submit">Submit</button>
+                    </form>
+                </section>
+                
+            </section>
+        </section>
+    </section>
+    <footer class="info">
+        <p>Created by John Harnois</a></p>
+        <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA </a></p>
+    </footer>
+</body>
 </html>

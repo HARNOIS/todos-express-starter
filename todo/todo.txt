@@ -1,17 +1,3 @@
-1. I need to make it so that the different insurances appear on the edit screen.
+1. Need to make it so that the rbtOrBcba only appears once. There is no need for this to be updated (except in special cases).
 
-
-
-
-
-Extra Code Snippet I Will Need
-                <ul class="insurance-list">
-                    <% clients.forEach(function(client) { %>
-                    <li>
-                        <div class="view">
-                            <input class="toggle" type="checkbox" name="client" value="<%= client.id %>" onchange="toggleInsuranceSelection(this);">
-                            <label><%= client.name %></label>
-                        </div>
-                    </li>
-                    <% }); %>
-                </ul>    
+2. There should be a check to make sure that the user has populated all necessary information before the sign up is complete.

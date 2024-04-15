@@ -1,0 +1,65 @@
+/* Adjustments for Active Clients and All Clients sections */
+.splitSections {
+    display: flex;
+    justify-content: space-between; /* Distribute sections evenly along the main axis */
+    align-items: flex-start; /* Align sections to the start (left) of the container */
+    margin-bottom: 40px; /* Add some bottom margin between the sections */
+}
+
+/* Style for each section */
+#leftSection,
+#rightSection {
+    width: calc(50% - 1px); /* Set width for each section (minus width of vertical bar) */
+    padding: 10px;
+    border-radius: 5px; /* Rounded corners for aesthetics */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    display: flex; /* Enable flexbox layout */
+    flex-direction: column; /* Set flex direction to column */
+    align-items: flex-start; /* Align content to the start (left) of the container */
+    justify-content: center; /* Center content vertically */
+    position: relative; /* Position relative for absolute positioning */
+}
+
+/* Style for section headings */
+#leftSection h3,
+#rightSection h3 {
+    align-self: center;
+    margin: 0; /* Remove default margin for heading */
+    color: #333; /* Set color for heading */
+}
+
+/* Vertical bar style */
+#leftSection::after,
+#rightSection::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px; /* Width of the vertical bar */
+    background-color: #ccc; /* Color of the vertical bar */
+    z-index: 1; /* Ensure the bar is above the content */
+}
+
+/* Adjust position for vertical bar */
+#leftSection::after {
+    right: 0;
+}
+
+#rightSection::after {
+    left: 0;
+}
+
+/* Style for the list items */
+#leftSection ul,
+#rightSection ul {
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    list-style-type: none; /* Remove default bullets */
+    margin-top: 10px; /* Add some top margin to the list */
+}
+
+#leftSection ul li,
+#rightSection ul li {
+    /* Add styles for individual list items */
+    margin-bottom: 5px; /* Add spacing between items */
+}
