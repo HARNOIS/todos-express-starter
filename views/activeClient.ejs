@@ -8,9 +8,138 @@
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/home.css">
     <link rel="stylesheet" href="/css/split.css">
-</head>
-<body>
+    <style>
+        .activeClientsList li label {
+            cursor: pointer;
+        }
+        .activeClientsList li label:hover {
+            text-decoration: line-through; /* Strike-through effect on hover */
+        }
+        .activeClientsList li input[type="checkbox"] {
+            display: none; /* Hide the checkbox */
+        }
+        .activeClientsList li input[type="checkbox"]:checked + label {
+            text-decoration: none; /* Remove strike-through effect when checkbox is checked */
+        }
+    </style>
+    <script>
+        function toggleClientStatus(clientId, checkbox) {
+            // Send AJAX request to update client status
+            const isChecked = checkbox ? checkbox.checked : null;
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/updateClientStatus', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Client status updated successfully");
+                        // After updating the status, refresh both client lists
+                        refreshClientLists();
+                    } else {
+                        console.error("Failed to update client status");
+                    }
+                }
+            };
+            xhr.send(JSON.stringify({ clientId: clientId, isChecked: isChecked }));
+        }
     
+        // Function to refresh both client lists using AJAX
+        function refreshClientLists() {
+            refreshActiveClientsList();
+            refreshAllClientsList();
+        }
+    
+        // Function to refresh the list of active clients
+        function refreshActiveClientsList() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/fetchActiveClientsList', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        // Update the active clients list with the fetched data
+                        const activeClients = JSON.parse(xhr.responseText);
+                        updateActiveClientsList(activeClients);
+                    } else {
+                        console.error("Failed to fetch active clients list");
+                    }
+                }
+            };
+            xhr.send();
+        }
+    
+        // Function to update the list of active clients in the DOM
+        function updateActiveClientsList(activeClients) {
+            const activeClientsList = document.querySelector('.activeClientsList');
+            activeClientsList.innerHTML = ''; // Clear the existing list
+    
+            activeClients.forEach(client => {
+                const li = document.createElement('li');
+                const label = document.createElement('label');
+                label.textContent = `${client.name} ${client.dob}`;
+                label.onclick = function() {
+                    toggleClientStatus(client.id, null);
+                };
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.checked = true; // Active clients are always checked
+                input.onclick = function(event) {
+                    event.stopPropagation();
+                    toggleClientStatus(client.id, this);
+                };
+                label.appendChild(input);
+                li.appendChild(label);
+                activeClientsList.appendChild(li);
+            });
+        }
+    
+        // Function to refresh the list of all clients
+        function refreshAllClientsList() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/fetchAllClientsList', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        // Update the all clients list with the fetched data
+                        const allClients = JSON.parse(xhr.responseText);
+                        updateAllClientsList(allClients);
+                    } else {
+                        console.error("Failed to fetch all clients list");
+                    }
+                }
+            };
+            xhr.send();
+        }
+    
+        // Function to update the list of all clients in the DOM
+        function updateAllClientsList(allClients) {
+            const allClientsList = document.querySelector('.allClientsList');
+            allClientsList.innerHTML = ''; // Clear the existing list
+    
+            allClients.forEach(client => {
+                const li = document.createElement('li');
+                const label = document.createElement('label');
+                label.textContent = `${client.name} ${client.dob}`;
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.checked = client.active;
+                input.onclick = function(event) {
+                    event.stopPropagation();
+                    toggleClientStatus(client.id, this);
+                };
+                label.appendChild(input);
+                li.appendChild(label);
+                allClientsList.appendChild(li);
+            });
+        }
+    
+        // Fetch the initial client lists when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshClientLists();
+        });
+    </script>
+    
+    </head>
+<body>
     <section class="todohome">
         <nav class="nav">
             <ul>
@@ -23,7 +152,6 @@
                     <form action="/logout" method="post">
                         <button class="logout" type="submit">Sign out</button>
                     </form>
-                    
                 </li>
             </ul>
         </nav>
@@ -32,38 +160,32 @@
         </header>
         <section>
             <h2>Modify Active Client </h2>
-
             <section class="splitSections">
-                
                 <section id="leftSection">
-                <h3> Active Clients </h3>
-                <ul class="activeClientsList"></ul>
-                    <% activeclients.forEach(function(client) { %>
-                        <li>
-                            <div class="view">
-                                <input class="toggle" type="checkbox" name="activeclient" value="<%= client.id %>" onchange="toggleInsuranceSelection(this);">
-                                <label><%= activeclient.name %> <%= activeclient.dob %></label>
-                            </div>
-                        </li>
-                    <% }); %>
-                </ul>    
-                </section>
-
-                <section id="rightSection">
-                    <h3> All Clients </h3>
-                    <form action="/activeClient" method="post">
-                        <ul class="allClientsList">
-                            <% clients.forEach(function(client) { %>
+                    <h3> Active Clients </h3>
+                        <ul class="activeClientsList">
+                            <% activeclients.forEach(function(activeclient) { %>
                                 <li>
                                     <div class="view">
-                                        <input class="toggle" type="checkbox" name="client" value="<%= client.id %>" onchange="toggleInsuranceSelection(this);">
-                                        <label><%= client.name %> <%= client.dob %></label>
+                                        <label><%= activeclient.name %> <%= activeclient.dob %></label>
                                     </div>
                                 </li>
                             <% }); %>
                         </ul>
-                        <button type="submit">Submit</button>
-                    </form>
+                        
+                </section>
+                <section id="rightSection">
+                    <h3> All Clients </h3>
+                    <ul class="allClientsList">
+                        <% clients.forEach(function(client) { %>
+                            <li>
+                                <div class="view">
+                                    <label><%= client.name %> <%= client.dob %></label>
+                                    <input class="toggle" type="checkbox" <% if (client.active) { %> checked <% } %>>
+                                </div>
+                            </li>
+                        <% }); %>
+                    </ul>
                 </section>
                 
             </section>

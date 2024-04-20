@@ -14,7 +14,6 @@ var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var userRouter = require('./routes/user');
 
-
 var app = express();
 
 app.locals.pluralize = require('pluralize');
@@ -29,14 +28,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false,
   store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' })
 }));
-app.use(passport.authenticate('session'));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/', authRouter);

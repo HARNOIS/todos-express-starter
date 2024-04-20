@@ -35,6 +35,7 @@
             <form action="/rbtOrBcba" method="post">
                 <h3>Are you a BCBA?</h3>
                 <div>
+                    <input type="hidden" name="userData" value="<%= JSON.stringify(user) %>">
                     <label>
                         <input type="radio" name="role" value="bcba" required>
                         Yes

@@ -63,3 +63,32 @@
     /* Add styles for individual list items */
     margin-bottom: 5px; /* Add spacing between items */
 }
+
+/* Style checkboxes */
+input[type="checkbox"] {
+    /* Hide default checkbox */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Define custom checkbox size */
+    width: 20px;
+    height: 20px;
+    /* Add custom border and background */
+    border: 1px solid #ccc;
+    background-color: #fff;
+    /* Add some padding for spacing */
+    padding: 2px;
+    /* Use cursor pointer for better usability */
+    cursor: pointer;
+}
+
+/* Style for checked state */
+input[type="checkbox"]:checked {
+    /* Change background color when checked */
+    background-color: #f7f9fc; /* Change to desired color */
+    /* Add styles for the checkmark */
+    background-image: url(../images/check.svg); /* Insert your SVG code here */
+    background-repeat: no-repeat;
+    background-size: contain; /* Adjust size of checkmark */
+    background-position: center; /* Position checkmark at center */
+}
