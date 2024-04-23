@@ -4,34 +4,25 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ascend Data Tracker</title>
-    <link rel="stylesheet" href="/css/base.css">
-    <link rel="stylesheet" href="/css/index.css">
-    <link rel="stylesheet" href="/css/home.css">
-    <link rel="stylesheet" href="/css/split.css">
+    <style>
+        /* Inline critical CSS here */
+        /* Example:
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        */
+    </style>
 </head>
 <body>
-    
     <section class="todohome">
-        <nav class="nav">
-            <ul>
-                <li class="user"><%= user.name || user.username || user.email %></li>
-                <br>
-                <li>
-                    <form action="/edit" method="get">
-                        <button class="editt" type="submit">Edit Profile</button>
-                    </form>
-                    <form action="/logout" method="post">
-                        <button class="logout" type="submit">Sign out</button>
-                    </form>
-                </li>
-            </ul>
-        </nav>
+        <%- include('navigation') %>
         <header>
             <h1>Required</h1>
         </header>
         <section>
             <h2>Please Fill Out </h2>
-
             <form action="/rbtOrBcba" method="post">
                 <h3>Are you a BCBA?</h3>
                 <div>
@@ -49,12 +40,30 @@
                 <input type="text" name="name" required>
                 <button type="submit">Submit</button>
             </form>
-                
         </section>
     </section>
     <footer class="info">
         <p>Created by John Harnois</a></p>
         <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA </a></p>
     </footer>
+
+    <!-- JavaScript to load non-critical CSS asynchronously -->
+    <script>
+        // Function to load CSS asynchronously
+        function loadCSS(href) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            document.head.appendChild(link);
+        }
+
+        // Defer loading of non-critical CSS files
+        window.addEventListener('load', function() {
+            loadCSS('/css/base.css');
+            loadCSS('/css/index.css');
+            loadCSS('/css/home.css');
+            loadCSS('/css/split.css');
+        });
+    </script>
 </body>
 </html>

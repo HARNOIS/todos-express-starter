@@ -2,111 +2,12 @@
 
 2. There should be a check to make sure that the user has populated all necessary information before the sign up is complete.
 
-3. Make it so that there are no check boxes on the left section in the active clients
+3. Make it so that there is a data table base uniquely associated to a program.
 
-4. Make it so that the left side automatically changes when the right side is clicked or unclicked
+4. Make it so that the user can input details for a program.
 
-
-
-
+5. Add a hold to goals in a behavioral_plan (this is so that the goals can be put on hold... that might not be clear to me later on)
 
 
+6. Modify behaviorPlans.ejs so that it has a post request
 
-
--Snippet from old activeClient.ejs
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ascend Data Tracker</title>
-    <link rel="stylesheet" href="/css/base.css">
-    <link rel="stylesheet" href="/css/index.css">
-    <link rel="stylesheet" href="/css/home.css">
-    <link rel="stylesheet" href="/css/split.css">
-    <script>
-        function toggleClientStatus(checkbox) {
-            const clientId = checkbox.value;
-            const isChecked = checkbox.checked;
-
-            console.log("Test Log")
-
-            // Send AJAX request to update client status
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/updateClientStatus', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        console.log("Client status updated successfully");
-                    } else {
-                        console.error("Failed to update client status");
-                    }
-                }
-            };
-            xhr.send(JSON.stringify({ clientId: clientId, isChecked: isChecked }));
-        }
-    </script>
-    </head>
-<body>
-    <section class="todohome">
-        <nav class="nav">
-            <ul>
-                <li class="user"><%= user.name || user.username || user.email %></li>
-                <br>
-                <li>
-                    <form action="/edit" method="get">
-                        <button class="editt" type="submit">Edit Profile</button>
-                    </form>
-                    <form action="/logout" method="post">
-                        <button class="logout" type="submit">Sign out</button>
-                    </form>
-                </li>
-            </ul>
-        </nav>
-        <header>
-            <h1>Settings</h1>
-        </header>
-        <section>
-            <h2>Modify Active Client </h2>
-            <section class="splitSections">
-                <section id="leftSection">
-                    <h3> Active Clients </h3>
-                    <ul class="activeClientsList"></ul>
-                    <% activeclients.forEach(function(activeclient) { %>
-                        <li>
-                            <div class="view">
-                                <input class="toggle" type="checkbox" name="activeclient" value="<%= activeclient.id %>" onchange="toggleClientStatus(this);" checked>
-                                <label><%= activeclient.name %> <%= activeclient.dob %></label>
-                            </div>
-                        </li>
-                    <% }); %>
-                </section>
-                <section id="rightSection">
-                    <h3> All Clients </h3>
-                    <ul class="allClientsList">
-                        <% clients.forEach(function(client) { %>
-                            <li>
-                                <div class="view">
-                                    <% activeclients.forEach(function(activeclient) { %>
-                                        <% if (client.name === activeclient.name) { %>
-                                            <input class="toggle" type="checkbox" name="activeclient" value="<%= client.id %>" onchange="toggleClientStatus(this);" checked>
-                                            <% return; %>
-                                        <% } %>
-                                    <% }); %>
-                                    <input class="toggle" type="checkbox" name="activeclient" value="<%= client.id %>" onchange="toggleClientStatus(this);">
-                                    <label><%= client.name %> <%= client.dob %></label>
-                                </div>
-                            </li>
-                        <% }); %>
-                    </ul>
-                </section>
-            </section>
-        </section>
-    </section>
-    <footer class="info">
-        <p>Created by John Harnois</a></p>
-        <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA </a></p>
-    </footer>
-</body>
-</html>

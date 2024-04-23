@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ascend Data Tracker</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/split.css">
+</head>
+<body>
+    <section class="todohome">
+        <!-- Placeholder for navigation -->
+        <%- include('navigation') %>
+
+        <header>
+            <h1>Settings</h1>
+        </header>
+        <section>
+            <h2>Modify Behavior Plans For Active Clients</h2>
+            <section class="fullSection">
+                <h3>Behavior Plans</h3>
+                <ul class="prettyList">
+                    <% activeclients.forEach(function(activeclient) { %>
+                        <li>
+                            <!-- Add onclick event to redirect to behaviorPlan page -->
+                            <div class="view" onclick="redirectToBehaviorPlan('<%= activeclient.id %>')">
+                                <label><%= activeclient.name %> <%= activeclient.dob %></label>
+                            </div>
+                        </li>
+                    <% }); %>
+                </ul>                
+            </section>
+        </section>
+    </section>
+    <footer class="info">
+        <p>Created by John Harnois</a></p>
+        <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA </a></p>
+    </footer>
+
+    <!-- JavaScript to redirect to behaviorPlan page -->
+    <script>
+        function redirectToBehaviorPlan(clientId) {
+            // Redirect to behaviorPlan page with client ID as parameter
+            window.location.href = `/behaviorPlan?clientId=${clientId}`;
+        }
+    </script>
+</body>
+</html>

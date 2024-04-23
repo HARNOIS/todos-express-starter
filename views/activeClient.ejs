@@ -141,20 +141,10 @@
     </head>
 <body>
     <section class="todohome">
-        <nav class="nav">
-            <ul>
-                <li class="user"><%= user.name || user.username || user.email %></li>
-                <br>
-                <li>
-                    <form action="/edit" method="get">
-                        <button class="editt" type="submit">Edit Profile</button>
-                    </form>
-                    <form action="/logout" method="post">
-                        <button class="logout" type="submit">Sign out</button>
-                    </form>
-                </li>
-            </ul>
-        </nav>
+        <!-- Placeholder for navigation -->
+        <%- include('navigation') %>
+
+
         <header>
             <h1>Settings</h1>
         </header>

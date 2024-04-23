@@ -88,8 +88,8 @@ db.serialize(function() {
     FOREIGN KEY (rbt_id) REFERENCES rbt(id))");
   //db.run("CREATE TABLE IF NOT EXISTS ")
 
-  // Create the program table with columns for goals 1 to 30
-  db.run(`CREATE TABLE IF NOT EXISTS program (
+  // Create the behavioral_plan table with columns for goals 1 to 30
+  db.run(`CREATE TABLE IF NOT EXISTS behavioral_plan (
     id INTEGER PRIMARY KEY,
     goal_type_id INTEGER DEFAULT 0,
     client_id INTEGER UNIQUE,
@@ -171,9 +171,21 @@ db.serialize(function() {
   db.run('INSERT OR IGNORE INTO insurance (name) VALUES ("Insurance A"), ("Insurance B"), ("Insurance C")')
   db.run("INSERT OR IGNORE INTO client (name, dob) VALUES  ('John Doe', '1990-05-15'),  ('Jane Smith', '1985-11-30'),  ('Alice Johnson', '1978-08-22')")
   // Insert a row into the goal_type table
-  db.run(`INSERT INTO goal_type (id, option, goal_type0, goal_type1, goal_type2, goal_type3, goal_type4, goal_type5, goal_type6, goal_type7, goal_type8, goal_type9, goal_type10) 
+  db.run(`INSERT OR IGNORE INTO goal_type (id, option, goal_type0, goal_type1, goal_type2, goal_type3, goal_type4, goal_type5, goal_type6, goal_type7, goal_type8, goal_type9, goal_type10) 
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
   [0, "default", "Undefined", "Discrete Percentage", "Frequency", "Yet to be defined", "Yet to be defined", "Yet to be defined", "Yet to be defined", "Yet to be defined", "Yet to be defined", "Yet to be defined", "Yet to be defined"]);
+
+
+  // Insert a row into the behavioral_plan table with predefined goal values (this is for testing)
+  db.run(`INSERT OR IGNORE INTO behavioral_plan (goal1, goal2, goal3, goal4, goal5, goal6, goal7, goal8, goal9, goal10, 
+    goal11, goal12, goal13, goal14, goal15, goal16, goal17, goal18, goal19, goal20,
+    goal21, goal22, goal23, goal24, goal25, goal26, goal27, goal28, goal29, goal30) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+  [0, 1, 1, 0, 2, 1, 2, 0, 1, 0, 
+  2, 0, 1, 2, 0, 2, 1, 0, 1, 0, 
+  2, 0, 1, 2, 0, 2, 1, 0, 1, 0]);
 
 
 });

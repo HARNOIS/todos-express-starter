@@ -1,3 +1,5 @@
+//This guy has the routes for changing the profile settings, this includes Adding New Clients, Modifying The Current Active Clients
+
 var express = require('express');
 var db = require('../db');
 
@@ -16,22 +18,80 @@ function setCacheControl(req, res, next) {
   next();
 }
 
+
 function fetchClients(req, res, next) {
-    db.all('SELECT * FROM client', [
-    ], function(err, rows) {
-      if (err) { return next(err); }
-      
-      var clients = rows.map(function(row) {
-        return {
-          id: row.id,
-          name: row.name,
-          dob: row.dob
-        }
-      });
-      res.locals.clients = clients;
-      next();
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM client', [], function(err, rows) {
+      if (err) {
+        reject(err);
+      } else {
+        const clients = rows.map(function(row) {
+          return {
+            id: row.id,
+            name: row.name,
+            dob: row.dob
+          }
+        });
+        res.locals.clients = clients;
+        resolve(clients);
+      }
     });
+  });
+}
+
+function fetchActiveClients(req, res, next) {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM client_bcba WHERE bcba_id = ?', [req.user.bcba_id], function(err, rows) {
+      if (err) {
+        reject(err);
+      } else {
+        const activeclientsPromises = rows.map(row => {
+          return new Promise((resolve, reject) => {
+            db.get('SELECT * FROM client WHERE id = ?', [row.client_id], function(err, clientRow) {
+              if (err) {
+                reject(err);
+              }
+
+              if (clientRow) {
+                resolve({
+                  id: clientRow.id,
+                  name: clientRow.name,
+                  dob: clientRow.dob
+                });
+              } else {
+                resolve(null);
+              }
+            });
+          });
+        });
+
+        Promise.all(activeclientsPromises)
+          .then(activeClients => {
+            // Filter out null values (in case clientRow is null)
+            activeClients = activeClients.filter(client => client !== null);
+            // Sort the active clients by ID
+            activeClients.sort((a, b) => a.id - b.id);
+            res.locals.activeclients = activeClients;
+            resolve(activeClients);
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    });
+  });
+}
+
+router.get('/behaviorPlans', setCacheControl, async function(req, res, next) {
+  try {
+    const clients = await fetchClients(req, res, next);
+    const activeClients = await fetchActiveClients(req, res, next);
+    res.render('behaviorPlans', { user: req.user, clients: clients, activeclients: activeClients });
+  } catch (err) {
+    next(err);
   }
+});
+
 
 
 
@@ -61,48 +121,12 @@ function fetchActiveClients(req, res, next) {
 }
 */
 
-function fetchActiveClients(req, res, next) {
-  console.log("\n\n\n")
-  console.log("Fetch Active Occurring")
-  db.all('SELECT * FROM client_bcba WHERE bcba_id = ?', [req.user.bcba_id], function(err, rows) {
-    if (err) { return next(err); }
-    console.log("This is the bcba_id", req.user.bcba_id)
-    console.log("This is the rows,", rows)
-    var activeclients = [];
-
-    // Iterate over each row in the result set
-    rows.forEach(function(row, index) {
-      db.all('SELECT * FROM client WHERE id = ?', [row.bcba_id], function(err, rows2) {
-        if (err) { return next(err); }
-
-        if (rows2.length > 0) {
-          // Assuming there's only one row returned for each client_id
-          console.log("This is the current row", row)
-          activeclients.push({
-            id: row.client_id,
-            name: rows2[0].name,
-            dob: rows2[0].dob
-          });
-        }
-
-        // If it's the last iteration, set locals and call next
-        if (index === rows.length - 1) {
-          res.locals.activeclients = activeclients;
-          next();
-        }
-      });
-    });
-
-    // If the result set is empty, set locals and call next immediately
-    if (rows.length === 0) {
-      res.locals.activeclients = activeclients;
-      next();
-    }
-  });
-}
 
 
-router.get('/edit', function(req, res, next) {
+
+
+
+router.get('/settings', function(req, res, next) {
     db.all('SELECT * FROM client', [
       ], function(err, rows) {
         if (err) { return next(err); }
@@ -115,18 +139,22 @@ router.get('/edit', function(req, res, next) {
           }
         });
         res.locals.clients = clients;
-        res.render('edit', { user: req.user });
+        res.render('settings', { user: req.user });
       });
   });
 
-router.get('/activeClient', setCacheControl, fetchClients, fetchActiveClients, function(req,res,next){
-    res.render('activeClient', { user: req.user, activeclients: res.locals.activeclients });
-});
+  router.get('/activeClient', setCacheControl, async function(req, res, next) {
+    try {
+      const clients = await fetchClients(req, res, next);
+      const activeClients = await fetchActiveClients(req, res, next);
+      res.render('activeClient', { user: req.user, clients: clients, activeclients: activeClients });
+    } catch (err) {
+      next(err);
+    }
+  });
 
 
 
-
-router.post('activeClient')
 
 
 router.get('/newClient', function(req,res,next){
@@ -159,121 +187,17 @@ router.post('/newClient', function(req,res,next){
 
 
 
-router.get('/rbtOrBcba', function(req,res,next){
-
-
-    res.render('rbtOrBcba', { user: req.user });
-
+router.get('/rbtOrBcba', setCacheControl, async function(req, res, next) {
+  try {
+    const clients = await fetchClients(req, res, next);
+    const activeClients = await fetchActiveClients(req, res, next);
+    res.render('rbtOrBcba', { user: req.user, clients: clients, activeclients: activeClients });
+  } catch (err) {
+    next(err);
+  }
 });
 
 
-//router.post('/rbtOrBcba', (req, res, next) => {
-//  const user = JSON.parse(req.body.userData);
-//  const { role, name } = req.body;
-//
-//  // Insert or update the corresponding table based on the role
-//  if (role === 'bcba') {
-//      // Check if the BCBA already exists
-//      db.get('SELECT id FROM bcba WHERE name = ?', [name], (err, row) => {
-//          if (err) {
-//              return next(err);
-//          }
-//          if (row) {
-//              // BCBA already exists, update the user's role and bcba_id
-//              const bcba_id = row.id;
-//              db.run('UPDATE users SET is_bcba = 1, is_rbt = 0, bcba_name = ?, bcba_id = ? WHERE id = ?', [name, bcba_id, req.user.id], function(err) {
-//                  if (err) {
-//                      return next(err);
-//                  }
-//                  // Update user object with new role and ID
-//                  user.is_bcba = 1;
-//                  user.bcba_id = bcba_id;
-//                  user.bcba_name = name;
-//                  user.is_rbt = 0;
-//                  user.rbt_id = null;
-//                  user.rbt_name = null;
-//                  console.log("This is the user", user)
-//                  res.redirect('/'); // Redirect to a success page
-//              });
-//          } else {
-//              // BCBA does not exist, insert into bcba table
-//              db.run('INSERT INTO bcba (name) VALUES (?)', [name], function(err) {
-//                  if (err) {
-//                      return next(err);
-//                  }
-//                  // Retrieve the ID of the newly inserted BCBA
-//                  const bcba_id = this.lastID;
-//                  // Update the user's role and bcba_id in the users table
-//                  db.run('UPDATE users SET is_bcba = 1, is_rbt = 0, bcba_name = ?, bcba_id = ? WHERE id = ?', [name, bcba_id, req.user.id], function(err) {
-//                      if (err) {
-//                          return next(err);
-//                      }
-//                      // Update user object with new role and ID
-//                      user.is_bcba = 1;
-//                      user.bcba_id = bcba_id;
-//                      user.bcba_name = name;
-//                      user.is_rbt = 0;
-//                      user.rbt_id = null;
-//                      user.rbt_name = null;
-//                      console.log("This is the user", user)
-//                      res.redirect('/'); // Redirect to a success page
-//                  });
-//              });
-//          }
-//      });
-//  } else if (role === 'rbt') {
-//      // Check if the RBT already exists
-//      db.get('SELECT id FROM rbt WHERE name = ?', [name], (err, row) => {
-//          if (err) {
-//              return next(err);
-//          }
-//          if (row) {
-//              // RBT already exists, update the user's role and rbt_id
-//              const rbt_id = row.id;
-//              db.run('UPDATE users SET is_bcba = 0, is_rbt = 1, rbt_name = ?, rbt_id = ? WHERE id = ?', [name, rbt_id, req.user.id], function(err) {
-//                  if (err) {
-//                      return next(err);
-//                  }
-//                  // Update user object with new role and ID
-//                  user.is_bcba = 0;
-//                  user.bcba_id = null;
-//                  user.bcba_name = null;
-//                  user.is_rbt = 1;
-//                  user.rbt_id = rbt_id;
-//                  user.rbt_name = name;
-//                  res.redirect('/'); // Redirect to a success page
-//              });
-//          } else {
-//              // RBT does not exist, insert into rbt table
-//              db.run('INSERT INTO rbt (name) VALUES (?)', [name], function(err) {
-//                  if (err) {
-//                      return next(err);
-//                  }
-//                  // Retrieve the ID of the newly inserted RBT
-//                  const rbt_id = this.lastID;
-//                  // Update the user's role and rbt_id in the users table
-//                  db.run('UPDATE users SET is_bcba = 0, is_rbt = 1, rbt_name = ?, rbt_id = ? WHERE id = ?', [name, rbt_id, req.user.id], function(err) {
-//                      if (err) {
-//                          return next(err);
-//                      }
-//                      // Update user object with new role and ID
-//                      user.is_bcba = 0;
-//                      user.bcba_id = null;
-//                      user.bcba_name = null;
-//                      user.is_rbt = 1;
-//                      user.rbt_id = rbt_id;
-//                      user.rbt_name = name;
-//                      res.redirect('/'); // Redirect to a success page
-//                  });
-//              });
-//          }
-//      });
-//  } else {
-//      // Handle invalid role
-//      res.status(400).send('Invalid role');
-//  }
-//});
-//
 
 
 
@@ -354,7 +278,6 @@ router.post('/updateClientStatus', (req, res) => {
       // If checkbox is checked
       if (req.user.is_bcba) {
           const userId = req.user.bcba_id;
-          console.log("1");
           // If user is BCBA, insert into client_bcba table
           db.run('INSERT INTO client_bcba (client_id, bcba_id) VALUES (?, ?)', [clientId, userId], function(err) {
               if (err) {
@@ -365,7 +288,6 @@ router.post('/updateClientStatus', (req, res) => {
           });
       } else {
           const userId = req.user.rbt_id;
-          console.log("2");
           // If user is RBT, insert into client_rbt table
           db.run('INSERT INTO client_rbt (client_id, rbt_id) VALUES (?, ?)', [clientId, userId], function(err) {
               if (err) {
@@ -379,7 +301,6 @@ router.post('/updateClientStatus', (req, res) => {
       // If checkbox is unchecked
       if (req.user.is_bcba) {
         const userId = req.user.bcba_id;
-          console.log("3");
           // If user is BCBA, delete from client_bcba table
           db.run('DELETE FROM client_bcba WHERE client_id = ? AND bcba_id = ?', [clientId, userId], function(err) {
               if (err) {
@@ -390,7 +311,6 @@ router.post('/updateClientStatus', (req, res) => {
           });
       } else {
           const userId = req.user.rbt_id;
-          console.log("4");
           // If user is RBT, delete from client_rbt table
           db.run('DELETE FROM client_rbt WHERE client_id = ? AND rbt_id = ?', [clientId, userId], function(err) {
               if (err) {
@@ -423,6 +343,11 @@ router.use(function(err, req, res, next) {
     }
   });
 
+
+
+
+  
+  
 
   
 
