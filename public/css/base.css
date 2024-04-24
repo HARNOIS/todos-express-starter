@@ -11,10 +11,22 @@ hr {
 	color: #b83f45;
 }
 
+
+h1 {
+	font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', serif;
+	color: #b83f45;
+}
+
+.button button:hover {
+
+}
+
 .learn a:hover {
 	text-decoration: underline;
 	color: #787e7e;
 }
+
+
 
 .learn h3,
 .learn h4,

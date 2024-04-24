@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Behavior Plan: <%= behaviorPlan.clientName %> (<%= behaviorPlan.clientDOB %>)</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/split.css">
+</head>
+<body>
+    <section class="behaviorPlan">
+        <!-- Placeholder for navigation -->
+        <%- include('navigation') %>
+
+        <header>
+            <h1>Behavior Plan for <%= behaviorPlan.clientName %> (<%= behaviorPlan.clientDOB %>)</h1>
+        </header>
+        <section>
+            <h2>Description:</h2>
+            <p><%= behaviorPlan.description %></p>
+            <h2>Goals:</h2>
+            <ul>
+                <% if (behaviorPlan.goals && behaviorPlan.goals.length > 0) { %>
+                    <% behaviorPlan.goals.forEach(function(goal) { %>
+                        <li>
+                            <form action="/goal" method="POST"> <!-- Changed method to POST -->
+                                <input type="hidden" name="goalId" value="<%= goal.id %>">
+                                <button type="submit"><%= goal.title %></button>
+                            </form>
+                        </li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No goals found.</li>
+                <% } %>
+            </ul>
+            <form action="/goal" method="POST"> <!-- Changed method to POST -->
+                <input type="hidden" name="behaviorPlanId" value="<%= behaviorPlan.id %>">
+                <button type="submit">Add New Goal</button>
+            </form>
+        </section>
+    </section>
+    <footer class="info">
+        <p>Created by John Harnois</p>
+        <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA</a></p>
+    </footer>
+</body>
+</html>

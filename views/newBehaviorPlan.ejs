@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Behavior Plan</title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/split.css">
+
+    <style>
+        /* Styles for dropdown menus */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-select {
+            background-color: #f9f9f9;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .dropdown-options {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            z-index: 1;
+            min-width: 150px;
+            max-height: 150px; /* Set max height for scroll */
+            overflow-y: auto; /* Enable vertical scroll */
+            text-align: center;
+        }
+
+        .dropdown-options a {
+            color: black;
+            padding: 5px 0;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-options a:hover {
+            background-color: #ddd;
+        }
+
+        /* Styling for goal selection div */
+        #goalSelections {
+            margin-top: 10px;
+        }
+
+        /* Styling for goal dropdowns */
+        .goal-dropdown {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <section class="todohome">
+        <!-- Placeholder for navigation -->
+        <% include('navigation') %>
+
+        <header>
+            <h1>New Plan</h1>
+        </header>
+        <section>
+            <h2>Client ID: <%= clientId %></h2>
+            <p>This client does not have an existing behavior plan. You can create a new one for them.</p>
+            <!-- Add form for creating a new behavior plan -->
+            <form action="/behaviorPlan" method="post">
+                <!-- Include fields for behavior plan details -->
+                <div>
+                    <label for="description">Behavior Description:</label><br>
+                    <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+                </div>
+                <div>
+                    <label for="interventions">Interventions:</label><br>
+                    <textarea id="interventions" name="interventions" rows="4" cols="50" required></textarea>
+                    <small>Separate multiple interventions with commas</small>
+                </div>
+                <!-- Add a dropdown menu to select the number of goals -->
+                <div class="dropdown">
+                    <label for="numberOfGoals">Number of Goals:</label><br>
+                    <div class="dropdown">
+                        <div class="dropdown-select" onclick="toggleDropdown('goalDropdown')">
+                            <span id="selectedGoal">1</span> <span>&#9660;</span>
+                        </div>
+                        <div id="goalDropdown" class="dropdown-options">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <a href="#" onclick="selectGoal('<%= i %>')"><%= i %></a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add a section to dynamically generate dropdown menus based on the selected number of goals -->
+                <div id="goalSelections"></div>
+
+                <button type="submit">Create Behavior Plan</button>
+            </form>
+        </section>
+    </section>
+    <footer class="info">
+        <p>Created by John Harnois</p>
+        <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA</a></p>
+    </footer>
+
+    <!-- JavaScript to toggle dropdown options and dynamically update selections -->
+    <script>
+        function toggleDropdown(dropdownId) {
+            var dropdown = document.getElementById(dropdownId);
+            dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+            if (dropdown.style.display === 'block') {
+                var dropdownRect = dropdown.getBoundingClientRect();
+                var viewportHeight = window.innerHeight;
+                if (dropdownRect.bottom > viewportHeight) {
+                    dropdown.style.top = -(dropdownRect.height + 5) + 'px';
+                }
+            }
+        }
+
+        function selectGoal(goal) {
+            document.getElementById('selectedGoal').textContent = goal;
+            toggleDropdown('goalDropdown');
+            generateGoalSelections();
+        }
+
+        // Function to generate dropdown menus for goals based on the selected number of goals
+        function generateGoalSelections() {
+            var numberOfGoals = document.getElementById('selectedGoal').textContent;
+            var goalSelections = document.getElementById('goalSelections');
+            goalSelections.innerHTML = ''; // Clear previous selections
+
+            // Get the default goal types from the server
+            fetch('/defaultGoalTypes')
+                .then(response => response.json())
+                .then(data => {
+                    // Loop to generate dropdown menus for each goal
+                    for (var i = 1; i <= numberOfGoals; i++) {
+                        var div = document.createElement('div');
+                        div.className = 'goal-dropdown'; // Add class for styling
+                        goalSelections.appendChild(div);
+
+                        var label = document.createElement('label');
+                        label.textContent = 'Goal ' + i + ': ';
+                        div.appendChild(label);
+
+                        var select = document.createElement('select');
+                        select.name = 'goal' + i;
+                        select.id = 'goal' + i;
+                        div.appendChild(select);
+
+                        // Add options for each dropdown menu
+                        for (var j = 0; j <= 10; j++) {
+                            var goalType = data['goal_type' + j];
+                            if (goalType && goalType !== 'Yet to be defined' && goalType !== 'Undefined') {
+                                var option = document.createElement('option');
+                                option.value = j;
+                                option.text = goalType;
+                                select.appendChild(option);
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching default goal types:', error));
+        }
+
+        // Call the function initially to generate dropdowns for 1 goal
+        generateGoalSelections();
+    </script>
+</body>
+</html>

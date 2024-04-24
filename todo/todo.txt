@@ -11,3 +11,19 @@
 
 6. Modify behaviorPlans.ejs so that it has a post request
 
+7. Somehow make it so that the goal_type in the goal table is consistent with an item from the corresponding goal_type table entry
+
+
+
+
+
+Current Idea for the behavior plan:
+
+New Behavior Plan Page, actually this should be the same as the edit behavior plan, but there just shouldn't be any goals yet.
+
+Edit behavior plan (this should be on the behaviorPlan.ejs). This should have the title of the behavior plan on top, then the 
+    description of the behavior plan. It should also have the name of the client on top so that you know you are on the correct
+    page. Then it should list all of the associated goals titles as you scroll down. You can click on a goal to go to its relevant
+    page (which should be given by goal.ejs). If you want to add a goal (this can only be done if you do not already have 30 goals),
+    then you can click on add new goal. Adding a new goal will first add a new goal to the goal database and then modify the 
+    behaviorPlan entry with the correct goal. The page associated with this goal will then be retrieved (goal.ejs).

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Goal: <%= goal.title %></title>
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/split.css">
+</head>
+<body>
+    <section class="goal">
+        <!-- Placeholder for navigation -->
+        <%- include('navigation') %>
+
+        <header>
+            <h1>Goal: <%= goal.title %></h1>
+        </header>
+        <section>
+            <h2>Description:</h2>
+            <p><%= goal.description %></p>
+            <h2>Criteria of Mastery:</h2>
+            <p><%= goal.criteria_of_mastery %></p>
+            <h2>Status:</h2>
+            <p><%= goal.is_mastered ? 'Mastered' : 'Not Mastered' %></p>
+            <!-- Add any additional details you want to display about the goal -->
+        </section>
+    </section>
+    <footer class="info">
+        <p>Created by John Harnois</p>
+        <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA</a></p>
+    </footer>
+</body>
+</html>

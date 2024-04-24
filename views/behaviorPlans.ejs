@@ -24,7 +24,7 @@
                 <ul class="prettyList">
                     <% activeclients.forEach(function(activeclient) { %>
                         <li>
-                            <!-- Add onclick event to redirect to behaviorPlan page -->
+                            <!-- Change onclick event to call redirectToBehaviorPlan function -->
                             <div class="view" onclick="redirectToBehaviorPlan('<%= activeclient.id %>')">
                                 <label><%= activeclient.name %> <%= activeclient.dob %></label>
                             </div>
@@ -39,11 +39,29 @@
         <p>Part of <a href="https://ascendwithaba.com/">Ascend ABA </a></p>
     </footer>
 
-    <!-- JavaScript to redirect to behaviorPlan page -->
+    <!-- JavaScript to send POST request to behaviorPlan page -->
     <script>
         function redirectToBehaviorPlan(clientId) {
-            // Redirect to behaviorPlan page with client ID as parameter
-            window.location.href = `/behaviorPlan?clientId=${clientId}`;
+            // Create a form element
+            var form = document.createElement('form');
+            // Set form attributes
+            form.method = 'POST';
+            form.action = '/behaviorPlan';
+
+            // Create an input element for client ID
+            var clientIdInput = document.createElement('input');
+            clientIdInput.type = 'hidden';
+            clientIdInput.name = 'clientId';
+            clientIdInput.value = clientId;
+
+            // Append clientIdInput to form
+            form.appendChild(clientIdInput);
+
+            // Append form to document body
+            document.body.appendChild(form);
+
+            // Submit the form
+            form.submit();
         }
     </script>
 </body>
